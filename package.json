@@ -20,17 +20,21 @@
     "build": "run-p build:main build:browser",
     "build:main": "esca-scripts build --input src --output dist --babel --multiple",
     "build:browser": "esca-scripts build --input './src/index.js' --output './dist-browser/index.js' --component --browser --minify --name moduleBoilerplate",
-    "dev": "esca-scripts dev ---input './dev/dev.js, ./dev/index.html' --browser",
+    "dev": "babel-node ./dev/dev.js",
     "prepublishOnly": "npm run build",
     "reset": "esca-scripts reset",
     "test": "esca-scripts test",
-    "travis": "opn https://travis-ci.org/escaladesports/javascript-module-boilerplate/branches"
+    "travis": "opn https://travis-ci.org/escaladesports/javascript-module-boilerplate/branches",
+    "encrypt": "envdotjs",
+    "unencrypt": "envdotjs --unencrypt"
   },
   "devDependencies": {
     "esca-scripts": "^0.14.1",
     "npm-run-all": "^4.1.2"
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0"
+    "babel-runtime": "^6.26.0",
+    "envdotjs": "^1.1.8",
+    "xlsx": "^0.12.12"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "configuration": {
+    "entity_type": "product",
+    "filter": "=list:default",
+    "properties":
+      "'sku','Name','Supplier','Release Date','NEW_COLUMN_JC','Long Description'",
+    "include_all_columns": true,
+    "product_type": "all"
+  }
+}
