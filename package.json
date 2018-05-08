@@ -1,7 +1,12 @@
 {
   "name": "javascript-module-boilerplate",
   "version": "2.2.6",
-  "keywords": ["javascript", "node", "module", "boilerplate"],
+  "keywords": [
+    "javascript",
+    "node",
+    "module",
+    "boilerplate"
+  ],
   "main": "dist/index.js",
   "browser": "dist-browser/index.js",
   "author": "Kennedy Rose <krose@escaladesports.com>",
@@ -14,16 +19,13 @@
     "analyze": "esca-scripts analyze --input './src/inject.js' --browser",
     "build": "run-p build:node && cp -av ./options/* ./dist/",
     "build:node": "babel-node ./src/index.js",
-    "build:main":
-      "esca-scripts build --input src --output dist --babel --multiple",
-    "build:browser":
-      "esca-scripts build --input './src/index.js' --output './dist-browser/index.js' --component --browser --minify --name moduleBoilerplate",
+    "build:main": "esca-scripts build --input src --output dist --babel --multiple",
+    "build:browser": "esca-scripts build --input './src/index.js' --output './dist-browser/index.js' --component --browser --minify --name moduleBoilerplate",
     "dev": "babel-node ./dev/dev.js",
     "prepublishOnly": "npm run build",
     "reset": "esca-scripts reset",
     "test": "esca-scripts test",
-    "travis":
-      "opn https://travis-ci.org/escaladesports/javascript-module-boilerplate/branches",
+    "travis": "opn https://travis-ci.org/escaladesports/javascript-module-boilerplate/branches",
     "encrypt": "envdotjs",
     "unencrypt": "envdotjs --unencrypt"
   },
@@ -32,9 +34,13 @@
     "npm-run-all": "^4.1.2"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "babel-runtime": "^6.26.0",
     "envdotjs": "^1.1.8",
+    "file-type": "^7.7.1",
     "fs-extra": "^6.0.0",
+    "isomorphic-fetch": "^2.2.1",
+    "mongoose": "^5.0.17",
     "xlsx": "^0.12.12"
   }
 }
