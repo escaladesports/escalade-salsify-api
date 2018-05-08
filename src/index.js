@@ -25,7 +25,6 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
   sheet_name_list.forEach(y => {
     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
     sheet.map(async item => {
-      console.log(item);
       try {
         await fs.outputJson(
           path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
