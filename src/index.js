@@ -8,6 +8,8 @@ const sheet_name_list = workbook.SheetNames;
 sheet_name_list.forEach(async y => {
   console.log(y);
   const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-  console.log(sheet);
+  sheet.map(item => {
+    console.log(item['Item Number']);
+  });
   await fs.outputJson(path.resolve(__dirname, `../dist/JSON/${y}.json`), sheet);
 });
