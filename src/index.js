@@ -9,7 +9,7 @@ sheet_name_list.forEach(async y => {
   console.log(y);
   const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
   sheet.map(item => {
-    console.log(item['Item Number']);
+    await fs.outputJson(path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`), item);
   });
-  await fs.outputJson(path.resolve(__dirname, `../dist/JSON/${y}.json`), sheet);
+  
 });
