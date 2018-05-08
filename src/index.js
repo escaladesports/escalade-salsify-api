@@ -16,6 +16,9 @@ const fetchSheet = async () => {
       const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
       sheetToJSON(xlsxFile, storedSheet);
     }
+  } else if (storedData.length === 0) {
+    console.log('NO SHEETS IN DB');
+    process.exit();
   }
 };
 
@@ -30,7 +33,8 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
           path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
           item
         );
-        await Sheet.findByIdAndRemove(storedSheet._id);
+        // await Sheet.findByIdAndRemove(storedSheet._id);
+        console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
         process.exit(0);
       } catch (e) {
         console.log(e);
