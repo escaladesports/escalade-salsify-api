@@ -15,6 +15,9 @@ const fetchSheet = async () => {
     if (storedSheet.status === 'completed' && storedSheet.url !== null) {
       const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
       sheetToJSON(xlsxFile, storedSheet);
+    } else {
+      console.log('sheet currently building');
+      process.exit(0);
     }
   } else if (storedData.length === 0) {
     await fs.mkdir(path.resolve(__dirname, `../dist/`));
