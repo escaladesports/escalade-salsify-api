@@ -16,13 +16,13 @@ const fetchSheet = async () => {
       const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
       sheetToJSON(xlsxFile, storedSheet);
     } else {
-      console.log('sheet currently building');
-      process.exit(1);
+      console.log('SHEET CURRENTLY BUILDING');
+      process.exit(0);
     }
   } else if (storedData.length === 0) {
     await fs.mkdir(path.resolve(__dirname, `../dist/`));
     console.log('NO SHEETS IN DB');
-    process.exit(1);
+    process.exit(0);
   }
 };
 
