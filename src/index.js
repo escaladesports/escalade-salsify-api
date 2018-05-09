@@ -18,7 +18,7 @@ const fetchSheet = async () => {
     }
   } else if (storedData.length === 0) {
     console.log('NO SHEETS IN DB');
-    process.exit();
+    process.exit(0);
   }
 };
 
