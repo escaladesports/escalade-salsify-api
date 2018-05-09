@@ -19,7 +19,7 @@ const fetchSheet = async () => {
   } else if (storedData.length === 0) {
     await fs.mkdir(path.resolve(__dirname, `../dist/`));
     console.log('NO SHEETS IN DB');
-    process.exit(0);
+    process.exit(1);
   }
 };
 
