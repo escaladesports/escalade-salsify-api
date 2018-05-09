@@ -33,7 +33,7 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
           path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
           item
         );
-        // await Sheet.findByIdAndRemove(storedSheet._id);
+        await Sheet.findByIdAndRemove(storedSheet._id);
         console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
         process.exit(0);
       } catch (e) {
