@@ -23,7 +23,13 @@ const fetchSheet = async () => {
 };
 
 const sheetToJSON = async (xlsxFile, storedSheet) => {
-  const workbook = XLSX.read(xlsxFile, { type: 'buffer' });
+  let workbook;
+  try {
+    workbook = XLSX.read(xlsxFile, { type: 'buffer' });
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
   const sheet_name_list = workbook.SheetNames;
   sheet_name_list.forEach(y => {
     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
