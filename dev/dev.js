@@ -20,51 +20,6 @@ const options = {
   }
 };
 
-const fetchSheet = async () => {
-  await connectToDatabase();
-  const storedData = await Sheet.find({});
-  if (storedData.length > 0) {
-    const storedSheet = storedData[0];
-    if (storedSheet.status === 'completed' && storedSheet.url !== null) {
-      const res = await fetch(storedSheet.url).then(res => res);
-      if (res.status === 403) {
-        await Sheet.findByIdAndRemove(storedSheet._id);
-        console.log('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
-        process.exit(0);
-      }
-      const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
-      sheetToJSON(xlsxFile, storedSheet);
-    }
-  }
-};
-
-const sheetToJSON = async (xlsxFile, storedSheet) => {
-  let workbook;
-  try {
-    workbook = await XLSX.read(xlsxFile, { type: 'buffer' });
-  } catch (e) {
-    console.log(e);
-    process.exit(1);
-  }
-  const sheet_name_list = workbook.SheetNames;
-  sheet_name_list.forEach(y => {
-    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-    sheet.map(async item => {
-      try {
-        await fs.outputJson(
-          path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
-          item
-        );
-        await Sheet.findByIdAndRemove(storedSheet._id);
-        process.exit(0);
-      } catch (e) {
-        console.log(e);
-        process.exit(1);
-      }
-    });
-  });
-};
-
 const listToJSON = async () => {
   let updatedList = [];
   const res = await fetch(options.url, {
@@ -91,24 +46,40 @@ const listToJSON = async () => {
     }
   }
   if (updatedList.length > 0) {
+    let updatedProducts = [];
     updatedList.forEach(async item => {
       const name = item.name
         .replace(/^\s+|[^\s\w]+|\s+$/g, '')
         .replace(/\s+/g, '-')
         .toLowerCase();
       const products = await fetch(
-        `${options.baseUrl}/products?filter==list:${item.id}`,
+        `${options.baseUrl}/products?filter==list:${item.id}&per_page=250`,
         {
           method: 'GET',
           headers: options.headers
         }
       ).then(res => res.json());
+      updatedProducts = updatedProducts.concat(products.lists);
+      const productPages = Math.ceil(
+        products.meta.total_entries / products.meta.per_page
+      );
+      if (productPages > 1) {
+        for (i = products.meta.current_page + 1; i < productPages; i++) {
+          const response = await fetch(`${options.url}&page=${i}`, {
+            method: 'GET',
+            headers: options.headers
+          }).then(response => response.json());
+          if (response) {
+            updatedProducts = updatedProducts.concat(response.lists);
+          }
+        }
+      }
       await fs.outputJson(
         path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
-        products
+        updatedProducts
       );
     });
   }
 };
 
-fetchSheet();
+listToJSON();

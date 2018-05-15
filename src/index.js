@@ -45,23 +45,40 @@ const listToJSON = async () => {
     }
   }
   if (updatedList.length > 0) {
+    let updatedProducts = [];
     updatedList.forEach(async item => {
       const name = item.name
         .replace(/^\s+|[^\s\w]+|\s+$/g, '')
         .replace(/\s+/g, '-')
         .toLowerCase();
       const products = await fetch(
-        `${options.baseUrl}/products?filter==list:${item.id}`,
+        `${options.baseUrl}/products?filter==list:${item.id}&per_page=250`,
         {
           method: 'GET',
           headers: options.headers
         }
       ).then(res => res.json());
+      updatedProducts = updatedProducts.concat(products.lists);
+      const productPages = Math.ceil(
+        products.meta.total_entries / products.meta.per_page
+      );
+      if (productPages > 1) {
+        for (i = products.meta.current_page + 1; i < productPages; i++) {
+          const response = await fetch(`${options.url}&page=${i}`, {
+            method: 'GET',
+            headers: options.headers
+          }).then(response => response.json());
+          if (response) {
+            updatedProducts = updatedProducts.concat(response.lists);
+          }
+        }
+      }
       await fs.outputJson(
         path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
-        products
+        updatedProducts
       );
     });
+    console.log('LISTS CREATED');
   }
 };
 
@@ -120,4 +137,4 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
 };
 
 listToJSON();
-fetchSheet();
+// fetchSheet();
