@@ -65,19 +65,18 @@ const listToJSON = async () => {
   }
 };
 
-  if (updatedList.length > 0) {
-    updatedList.forEach(async item => {
-      const products = await fetch(
-        `${options.baseUrl}/products?filter==list:${item.id}`
-      ).then(res => res.json());
+if (updatedList.length > 0) {
+  updatedList.forEach(async item => {
+    const products = await fetch(
+      `${options.baseUrl}/products?filter==list:${item.id}`
+    ).then(res => res.json());
 
-      await fs.outputJson(
-        path.resolve(__dirname, `../dist/JSON/lists/${item.name}.json`),
-        products
-      );
-    });
-  }
-};
+    await fs.outputJson(
+      path.resolve(__dirname, `../dist/JSON/lists/${item.name}.json`),
+      products
+    );
+  });
+}
 
 const fetchSheet = async () => {
   await connectToDatabase();
