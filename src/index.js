@@ -45,8 +45,8 @@ const listToJSON = async () => {
     }
   }
   if (updatedList.length > 0) {
-    let updatedProducts = [];
-    updatedList.forEach(async item => {
+    updatedList.forEach(async (item, index) => {
+      let updatedProducts = [];
       const name = item.name
         .replace(/^\s+|[^\s\w]+|\s+$/g, '')
         .replace(/\s+/g, '-')
@@ -58,13 +58,14 @@ const listToJSON = async () => {
           headers: options.headers
         }
       ).then(res => res.json());
+
       updatedProducts = updatedProducts.concat(products.products);
       const productPages = Math.ceil(
         products.meta.total_entries / products.meta.per_page
       );
-      let i;
+
       if (productPages > 1) {
-        for (i = products.meta.current_page + 1; i < productPages; i++) {
+        for (let i = products.meta.current_page + 1; i < productPages; i++) {
           const response = await fetch(`${options.url}&page=${i}`, {
             method: 'GET',
             headers: options.headers
@@ -74,18 +75,15 @@ const listToJSON = async () => {
           }
         }
       }
+
       await fs.outputJson(
         path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
         updatedProducts
       );
+      if (index + 1 === updatedList.length) {
+        console.log('LISTS CREATED');
+      }
     });
-    if (updatedProducts.length > 0) {
-      console.log('LISTS CREATED');
-      process.exit(0);
-    } else {
-      console.log('LISTS NOT CREATED');
-      process.exit(1);
-    }
   }
 };
 
