@@ -66,6 +66,7 @@ const listToJSON = async () => {
 };
 
 const fetchSheet = async () => {
+  await fs.mkdir(path.resolve(__dirname, '../dist'));
   await connectToDatabase();
   const storedData = await Sheet.find({});
   if (storedData.length > 0) {
