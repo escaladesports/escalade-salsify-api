@@ -29,6 +29,7 @@ const listToJSON = async () => {
   if (res) {
     const { lists, meta } = res;
     updatedList = updatedList.concat(lists);
+    console.log('UPDATED LIST 1 ', updatedList);
     const { total_entries, per_page, current_page } = meta;
     const pages = Math.ceil(total_entries / per_page);
     let i;
@@ -44,6 +45,8 @@ const listToJSON = async () => {
       }
     }
   }
+  console.log('UPDATED LIST 2 ', updatedList);
+
   if (updatedList.length > 0) {
     updatedList.forEach(async item => {
       const name = item.name
