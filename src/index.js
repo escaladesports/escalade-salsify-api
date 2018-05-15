@@ -21,6 +21,7 @@ const options = {
 };
 const listToJSON = async () => {
   let updatedList = [];
+  console.log('UPDATED LIST', updatedList);
   const res = await fetch(options.url, {
     method: 'GET',
     headers: options.headers
@@ -46,25 +47,26 @@ const listToJSON = async () => {
     }
   }
   console.log('UPDATED LIST 2 ', updatedList);
-
-  if (updatedList.length > 0) {
-    updatedList.forEach(async item => {
-      const name = item.name
-        .replace(/^\s+|[^\s\w]+|\s+$/g, '')
-        .replace(/\s+/g, '-')
-        .toLowerCase();
-      const products = await fetch(
-        `${options.baseUrl}/products?filter==list:${item.id}`,
-        {
-          method: 'GET',
-          headers: options.headers
-        }
-      ).then(res => res.json());
-      await fs.outputJson(
-        path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
-        products
-      );
-    });
+  if (updatedList) {
+    if (updatedList.length > 0) {
+      updatedList.forEach(async item => {
+        const name = item.name
+          .replace(/^\s+|[^\s\w]+|\s+$/g, '')
+          .replace(/\s+/g, '-')
+          .toLowerCase();
+        const products = await fetch(
+          `${options.baseUrl}/products?filter==list:${item.id}`,
+          {
+            method: 'GET',
+            headers: options.headers
+          }
+        ).then(res => res.json());
+        await fs.outputJson(
+          path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
+          products
+        );
+      });
+    }
   }
 };
 
