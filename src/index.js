@@ -58,7 +58,7 @@ const listToJSON = async () => {
           headers: options.headers
         }
       ).then(res => res.json());
-      updatedProducts = updatedProducts.concat(products.lists);
+      updatedProducts = updatedProducts.concat(products.products);
       const productPages = Math.ceil(
         products.meta.total_entries / products.meta.per_page
       );
@@ -70,7 +70,7 @@ const listToJSON = async () => {
             headers: options.headers
           }).then(response => response.json());
           if (response) {
-            updatedProducts = updatedProducts.concat(response.lists);
+            updatedProducts = updatedProducts.concat(response.products);
           }
         }
       }
