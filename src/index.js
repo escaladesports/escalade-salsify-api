@@ -51,6 +51,8 @@ const listToJSON = async () => {
         }
       }
     }
+    let productList = [];
+
     if (updatedList.length > 0) {
       updatedList.forEach(async (item, index) => {
         let updatedProducts = [];
@@ -74,11 +76,16 @@ const listToJSON = async () => {
         );
 
         if (productPages > 1) {
-          for (let i = products.meta.current_page + 1; i < productPages; i++) {
-            const response = await fetch(`${options.url}&page=${i}`, {
-              method: 'GET',
-              headers: options.headers
-            })
+          for (let i = products.meta.current_page + 1; i <= productPages; i++) {
+            const response = await fetch(
+              `${options.baseUrl}/products?filter==list:${
+                item.id
+              }&per_page=250&page=${i}`,
+              {
+                method: 'GET',
+                headers: options.headers
+              }
+            )
               .then(response => response.json())
               .catch(err => reject(err));
             if (response) {
@@ -86,12 +93,14 @@ const listToJSON = async () => {
             }
           }
         }
-
         await fs.outputJson(
           path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
           updatedProducts
         );
-        if (index + 1 === updatedList.length) {
+        if (updatedProducts.length === products.meta.total_entries) {
+          productList.push(updatedProducts);
+        }
+        if (productList.length === updatedList.length) {
           resolve('success');
         }
       });
