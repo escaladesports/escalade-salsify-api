@@ -100,66 +100,67 @@ const listToJSON = async () => {
 };
 
 const fetchSheet = async () => {
-  await fs.mkdir(path.resolve(__dirname, '../dist'));
-  await connectToDatabase();
-  const storedData = await Sheet.find({});
-  if (storedData.length > 0) {
-    const storedSheet = storedData[0];
-    if (storedSheet.status === 'completed' && storedSheet.url !== null) {
-      const res = await fetch(storedSheet.url).then(res => res);
-      if (res.status === 403) {
-        await Sheet.findByIdAndRemove(storedSheet._id);
-        console.log('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
-        process.exit(0);
+  return new Promise(async (resolve, reject) => {
+    await fs.mkdir(path.resolve(__dirname, '../dist'));
+    await connectToDatabase();
+    const storedData = await Sheet.find({});
+    if (storedData.length > 0) {
+      const storedSheet = storedData[0];
+      if (storedSheet.status === 'completed' && storedSheet.url !== null) {
+        const res = await fetch(storedSheet.url).then(res => res);
+        if (res.status === 403) {
+          await Sheet.findByIdAndRemove(storedSheet._id);
+          resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
+        }
+        const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
+        let workbook;
+        try {
+          workbook = XLSX.read(xlsxFile, { type: 'buffer' });
+        } catch (e) {
+          reject(e);
+        }
+        const sheet_name_list = workbook.SheetNames;
+        sheet_name_list.forEach(y => {
+          const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          sheet.map(async item => {
+            try {
+              await fs.outputJson(
+                path.resolve(
+                  __dirname,
+                  `../dist/JSON/${item['Item Number']}.json`
+                ),
+                item
+              );
+              await Sheet.findByIdAndRemove(storedSheet._id);
+              resolve('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
+            } catch (e) {
+              reject(e);
+            }
+          });
+        });
+      } else {
+        resolve('SHEET CURRENTLY BUILDING');
       }
-      const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
-      sheetToJSON(xlsxFile, storedSheet);
-    } else {
-      console.log('SHEET CURRENTLY BUILDING');
-      process.exit(0);
+    } else if (storedData.length === 0) {
+      await fs.mkdir(path.resolve(__dirname, `../dist/`));
+      resolve('NO SHEETS IN DB');
     }
-  } else if (storedData.length === 0) {
-    await fs.mkdir(path.resolve(__dirname, `../dist/`));
-    console.log('NO SHEETS IN DB');
-    process.exit(0);
-  }
-};
-
-const sheetToJSON = async (xlsxFile, storedSheet) => {
-  let workbook;
-  try {
-    workbook = XLSX.read(xlsxFile, { type: 'buffer' });
-  } catch (e) {
-    console.log(e);
-    process.exit(1);
-  }
-  const sheet_name_list = workbook.SheetNames;
-  sheet_name_list.forEach(y => {
-    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-    sheet.map(async item => {
-      try {
-        await fs.outputJson(
-          path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
-          item
-        );
-        await Sheet.findByIdAndRemove(storedSheet._id);
-        console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
-        process.exit(0);
-      } catch (e) {
-        console.log(e);
-        process.exit(1);
-      }
-    });
   });
 };
 
-const runApi = async () => {
-  const res = await listToJSON();
-  if (res === 'success') {
-    fetchSheet();
-  } else {
-    process.exit(1);
-  }
+const runApi = () => {
+  listToJSON
+    .then(listRes => {
+      if (listRes === 'success') return fetchSheet();
+    })
+    .then(sheetRes => {
+      console.log(sheetRes);
+      process.exit(0);
+    })
+    .catch(err => {
+      console.log(err);
+      process.exit(1);
+    });
 };
 
 runApi();
