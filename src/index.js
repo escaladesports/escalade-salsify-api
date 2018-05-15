@@ -137,4 +137,4 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
 };
 
 listToJSON();
-// fetchSheet();
+fetchSheet();
