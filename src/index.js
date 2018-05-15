@@ -62,6 +62,7 @@ const listToJSON = async () => {
       const productPages = Math.ceil(
         products.meta.total_entries / products.meta.per_page
       );
+      let i;
       if (productPages > 1) {
         for (i = products.meta.current_page + 1; i < productPages; i++) {
           const response = await fetch(`${options.url}&page=${i}`, {
