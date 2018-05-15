@@ -149,7 +149,7 @@ const fetchSheet = async () => {
 };
 
 const runApi = () => {
-  listToJSON
+  listToJSON()
     .then(listRes => {
       if (listRes === 'success') return fetchSheet();
     })
