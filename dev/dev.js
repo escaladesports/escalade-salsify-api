@@ -26,6 +26,12 @@ const fetchSheet = async () => {
   if (storedData.length > 0) {
     const storedSheet = storedData[0];
     if (storedSheet.status === 'completed' && storedSheet.url !== null) {
+      const res = await fetch(storedSheet.url).then(res => res);
+      if (res.status === 403) {
+        await Sheet.findByIdAndRemove(storedSheet._id);
+        console.log('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
+        process.exit(0);
+      }
       const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
       sheetToJSON(xlsxFile, storedSheet);
     }
@@ -33,12 +39,17 @@ const fetchSheet = async () => {
 };
 
 const sheetToJSON = async (xlsxFile, storedSheet) => {
-  const workbook = XLSX.read(xlsxFile, { type: 'buffer' });
+  let workbook;
+  try {
+    workbook = await XLSX.read(xlsxFile, { type: 'buffer' });
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
   const sheet_name_list = workbook.SheetNames;
   sheet_name_list.forEach(y => {
     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
     sheet.map(async item => {
-      console.log(item);
       try {
         await fs.outputJson(
           path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
@@ -100,4 +111,4 @@ const listToJSON = async () => {
   }
 };
 
-listToJSON();
+fetchSheet();

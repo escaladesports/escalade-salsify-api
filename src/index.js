@@ -71,6 +71,12 @@ const fetchSheet = async () => {
   if (storedData.length > 0) {
     const storedSheet = storedData[0];
     if (storedSheet.status === 'completed' && storedSheet.url !== null) {
+      const res = await fetch(storedSheet.url).then(res => res);
+      if (res.status === 403) {
+        await Sheet.findByIdAndRemove(storedSheet._id);
+        console.log('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
+        process.exit(0);
+      }
       const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
       sheetToJSON(xlsxFile, storedSheet);
     } else {
