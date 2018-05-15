@@ -156,6 +156,7 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
 const runApi = async () => {
   const res = await listToJSON();
   if (res === 'success') {
+    console.log('LISTS CREATED');
     fetchSheet();
   } else {
     process.exit(1);
