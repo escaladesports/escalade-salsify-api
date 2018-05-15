@@ -1,4 +1,4 @@
-require('evndotjs').load();
+require('envdotjs').load();
 import config from '../config.json';
 import path from 'path';
 import XLSX from 'xlsx';
