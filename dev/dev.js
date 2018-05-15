@@ -45,6 +45,7 @@ const listToJSON = async () => {
       }
     }
   }
+
   if (updatedList.length > 0) {
     let updatedProducts = [];
     updatedList.forEach(async item => {
@@ -59,10 +60,11 @@ const listToJSON = async () => {
           headers: options.headers
         }
       ).then(res => res.json());
-      updatedProducts = updatedProducts.concat(products.lists);
+      updatedProducts = updatedProducts.concat(products.products);
       const productPages = Math.ceil(
         products.meta.total_entries / products.meta.per_page
       );
+      let i;
       if (productPages > 1) {
         for (i = products.meta.current_page + 1; i < productPages; i++) {
           const response = await fetch(`${options.url}&page=${i}`, {
@@ -70,7 +72,7 @@ const listToJSON = async () => {
             headers: options.headers
           }).then(response => response.json());
           if (response) {
-            updatedProducts = updatedProducts.concat(response.lists);
+            updatedProducts = updatedProducts.concat(response.products);
           }
         }
       }
@@ -79,6 +81,13 @@ const listToJSON = async () => {
         updatedProducts
       );
     });
+    if (updatedProducts.length > 0) {
+      console.log('LISTS CREATED');
+      process.exit(0);
+    } else {
+      console.log('LISTS NOT CREATED');
+      process.exit(1);
+    }
   }
 };
 

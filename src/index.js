@@ -79,7 +79,13 @@ const listToJSON = async () => {
         updatedProducts
       );
     });
-    console.log('LISTS CREATED');
+    if (updatedProducts.length > 0) {
+      console.log('LISTS CREATED');
+      process.exit(0);
+    } else {
+      console.log('LISTS NOT CREATED');
+      process.exit(1);
+    }
   }
 };
 
