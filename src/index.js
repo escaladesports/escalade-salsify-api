@@ -123,17 +123,17 @@ const fetchSheet = async () => {
       if (res.status === 403) {
         await Sheet.findByIdAndRemove(storedSheet._id);
         console.log('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
-        process.exit(0);
+        process.exit(1);
       }
       const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
       sheetToJSON(xlsxFile, storedSheet);
     } else {
       console.log('SHEET CURRENTLY BUILDING');
-      process.exit(0);
+      process.exit(1);
     }
   } else if (storedData.length === 0) {
     console.log('NO SHEETS IN DB');
-    process.exit(0);
+    process.exit(1);
   }
 };
 
