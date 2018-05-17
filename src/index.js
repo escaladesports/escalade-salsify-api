@@ -100,6 +100,11 @@ const listToJSON = async () => {
         if (updatedProducts.length === products.meta.total_entries) {
           productList.push(updatedProducts);
         }
+        console.log(
+          `${(productList.length / updatedList.length * 100).toFixed(
+            2
+          )} %  -  lists completed`
+        );
         if (productList.length === updatedList.length) {
           resolve('success');
         }
@@ -143,18 +148,25 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
   const sheet_name_list = workbook.SheetNames;
   sheet_name_list.forEach(y => {
     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-    sheet.map(async item => {
+    let itemList = [];
+    sheet.forEach(async (item, i) => {
       try {
         await fs.outputJson(
           path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
           item
         );
-        await Sheet.findByIdAndRemove(storedSheet._id);
-        console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
-        process.exit(0);
+        const data = await fs.readJson(
+          path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`)
+        );
+        itemList.push(data);
       } catch (e) {
         console.log(e);
         process.exit(1);
+      }
+      if (sheet.length === itemList.length) {
+        await Sheet.findByIdAndRemove(storedSheet._id);
+        console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
+        process.exit(0);
       }
     });
   });
