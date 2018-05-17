@@ -94,7 +94,7 @@ const listToJSON = async () => {
           }
         }
         await fs.outputJson(
-          path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
+          path.resolve(__dirname, `../dist/lists/${name}.json`),
           updatedProducts
         );
         if (updatedProducts.length === products.meta.total_entries) {
@@ -123,17 +123,17 @@ const fetchSheet = async () => {
       if (res.status === 403) {
         await Sheet.findByIdAndRemove(storedSheet._id);
         console.log('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
-        process.exit(1);
+        process.exit(0);
       }
       const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
       sheetToJSON(xlsxFile, storedSheet);
     } else {
       console.log('SHEET CURRENTLY BUILDING');
-      process.exit(1);
+      process.exit(0);
     }
   } else if (storedData.length === 0) {
     console.log('NO SHEETS IN DB');
-    process.exit(1);
+    process.exit(0);
   }
 };
 
@@ -152,11 +152,14 @@ const sheetToJSON = async (xlsxFile, storedSheet) => {
     sheet.forEach(async (item, i) => {
       try {
         await fs.outputJson(
-          path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
+          path.resolve(
+            __dirname,
+            `../dist/product/${item['Item Number']}.json`
+          ),
           item
         );
         const data = await fs.readJson(
-          path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`)
+          path.resolve(__dirname, `../dist/product/${item['Item Number']}.json`)
         );
         itemList.push(data);
       } catch (e) {

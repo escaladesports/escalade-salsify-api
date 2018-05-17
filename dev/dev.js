@@ -182,4 +182,4 @@ const runApi = async () => {
   }
 };
 
-fetchSheet();
+runApi();
