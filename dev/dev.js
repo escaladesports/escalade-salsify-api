@@ -136,63 +136,65 @@ const listToJSON = async jsonSheet => {
 };
 
 const fetchSheet = async () => {
-  await connectToDatabase();
-  const storedData = await Sheet.find({});
-  if (storedData.length > 0) {
-    const storedSheet = storedData[0];
-    if (storedSheet.status === 'completed' && storedSheet.url !== null) {
-      const res = await fetch(storedSheet.url).then(res => res);
-      if (res.status === 403) {
-        await Sheet.findByIdAndRemove(storedSheet._id);
-        resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
-        return;
-      }
-      const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
-      let workbook;
-      try {
-        workbook = XLSX.read(xlsxFile, { type: 'buffer' });
-      } catch (e) {
-        reject(e);
-      }
-      const sheet_name_list = workbook.SheetNames;
-      sheet_name_list.forEach(y => {
-        const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-        let itemList = [];
-        sheet.forEach(async (item, i) => {
-          try {
-            await fs.outputJson(
-              path.resolve(
-                __dirname,
-                `../dist/JSON/${item['Item Number']}.json`
-              ),
-              item
-            );
-            const data = await fs.readJson(
-              path.resolve(
-                __dirname,
-                `../dist/JSON/${item['Item Number']}.json`
-              )
-            );
-            itemList.push(data);
-          } catch (e) {
-            reject(e);
-          }
-          const string = `${(itemList.length / sheet.length * 100).toFixed(
-            2
-          )} %  -  sheet completed`;
-          process.stdout.write(`${string}\r`);
-          if (sheet.length === itemList.length) {
-            await Sheet.findByIdAndRemove(storedSheet._id);
-            resolve(sheet);
-          }
+  return new Promise(async (resolve, reject) => {
+    await connectToDatabase();
+    const storedData = await Sheet.find({});
+    if (storedData.length > 0) {
+      const storedSheet = storedData[0];
+      if (storedSheet.status === 'completed' && storedSheet.url !== null) {
+        const res = await fetch(storedSheet.url).then(res => res);
+        if (res.status === 403) {
+          await Sheet.findByIdAndRemove(storedSheet._id);
+          resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
+          return;
+        }
+        const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
+        let workbook;
+        try {
+          workbook = XLSX.read(xlsxFile, { type: 'buffer' });
+        } catch (e) {
+          reject(e);
+        }
+        const sheet_name_list = workbook.SheetNames;
+        sheet_name_list.forEach(y => {
+          const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          let itemList = [];
+          sheet.forEach(async (item, i) => {
+            try {
+              await fs.outputJson(
+                path.resolve(
+                  __dirname,
+                  `../dist/JSON/${item['Item Number']}.json`
+                ),
+                item
+              );
+              const data = await fs.readJson(
+                path.resolve(
+                  __dirname,
+                  `../dist/JSON/${item['Item Number']}.json`
+                )
+              );
+              itemList.push(data);
+            } catch (e) {
+              reject(e);
+            }
+            const string = `${(itemList.length / sheet.length * 100).toFixed(
+              2
+            )} %  -  sheet completed`;
+            process.stdout.write(`${string}\r`);
+            if (sheet.length === itemList.length) {
+              await Sheet.findByIdAndRemove(storedSheet._id);
+              resolve(sheet);
+            }
+          });
         });
-      });
-    } else {
-      resolve('SHEET CURRENTLY BUILDING');
+      } else {
+        resolve('SHEET CURRENTLY BUILDING');
+      }
+    } else if (storedData.length === 0) {
+      resolve('NO SHEETS IN DB');
     }
-  } else if (storedData.length === 0) {
-    resolve('NO SHEETS IN DB');
-  }
+  });
 };
 
 const runApi = async () => {

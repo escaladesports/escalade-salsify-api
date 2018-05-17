@@ -8,7 +8,7 @@ import axios from 'axios';
 import { connectToDatabase } from '../utils/db';
 import Sheet from '../models/Sheet';
 
-const listToJSON = async () => {
+const listToJSON = async jsonSheet => {
   const listPerPage = 250;
   const options = {
     baseUrl: `https://app.salsify.com/api/orgs/${process.env.SALSIFY_ORG_ID}`,
@@ -22,6 +22,10 @@ const listToJSON = async () => {
   };
 
   return new Promise(async (resolve, reject) => {
+    if (!Array.isArray(jsonSheet)) {
+      reject('Wrong Sheet Format');
+      return;
+    }
     let updatedList = [];
 
     const res = await fetch(options.url, {
@@ -54,14 +58,14 @@ const listToJSON = async () => {
     let productList = [];
 
     if (updatedList.length > 0) {
-      updatedList.forEach(async (item, index) => {
+      updatedList.forEach(async (list, index) => {
         let updatedProducts = [];
-        const name = item.name
+        const name = list.name
           .replace(/^\s+|[^\s\w]+|\s+$/g, '')
           .replace(/\s+/g, '-')
           .toLowerCase();
         const products = await fetch(
-          `${options.baseUrl}/products?filter==list:${item.id}&per_page=250`,
+          `${options.baseUrl}/products?filter==list:${list.id}&per_page=250`,
           {
             method: 'GET',
             headers: options.headers
@@ -70,7 +74,15 @@ const listToJSON = async () => {
           .then(res => res.json())
           .catch(err => reject(err));
 
-        updatedProducts = updatedProducts.concat(products.products);
+        products.products.map(product =>
+          updatedProducts.push(
+            jsonSheet.find(
+              item =>
+                item['Item Number'].toLowerCase() === product.id.toLowerCase()
+            ) || product
+          )
+        );
+
         const productPages = Math.ceil(
           products.meta.total_entries / products.meta.per_page
         );
@@ -79,7 +91,7 @@ const listToJSON = async () => {
           for (let i = products.meta.current_page + 1; i <= productPages; i++) {
             const response = await fetch(
               `${options.baseUrl}/products?filter==list:${
-                item.id
+                list.id
               }&per_page=250&page=${i}`,
               {
                 method: 'GET',
@@ -89,7 +101,15 @@ const listToJSON = async () => {
               .then(response => response.json())
               .catch(err => reject(err));
             if (response) {
-              updatedProducts = updatedProducts.concat(response.products);
+              response.products.map(product =>
+                updatedProducts.push(
+                  jsonSheet.find(
+                    item =>
+                      item['Item Number'].toLowerCase() ===
+                      product.id.toLowerCase()
+                  ) || product
+                )
+              );
             }
           }
         }
@@ -100,11 +120,13 @@ const listToJSON = async () => {
         if (updatedProducts.length === products.meta.total_entries) {
           productList.push(updatedProducts);
         }
-        console.log(
-          `${(productList.length / updatedList.length * 100).toFixed(
-            2
-          )} %  -  lists completed`
-        );
+        const string = `${(
+          productList.length /
+          updatedList.length *
+          100
+        ).toFixed(2)} %  -  lists completed`;
+        process.stdout.write(`${string}\r`);
+
         if (productList.length === updatedList.length) {
           resolve('success');
         }
@@ -114,7 +136,7 @@ const listToJSON = async () => {
 };
 
 const fetchSheet = async () => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     await connectToDatabase();
     const storedData = await Sheet.find({});
     if (storedData.length > 0) {
@@ -123,56 +145,77 @@ const fetchSheet = async () => {
         const res = await fetch(storedSheet.url).then(res => res);
         if (res.status === 403) {
           await Sheet.findByIdAndRemove(storedSheet._id);
-          resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE')
+          resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
+          return;
         }
         const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
         let workbook;
-    try {
-      workbook = XLSX.read(xlsxFile, { type: 'buffer' });
-    } catch (e) {
-      reject(e);
-    }
-    const sheet_name_list = workbook.SheetNames;
-    sheet_name_list.forEach(y => {
-      const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-      let itemList = [];
-      sheet.forEach(async (item, i) => {
         try {
-          await fs.outputJson(
-            path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`),
-            item
-          );
-          const data = await fs.readJson(
-            path.resolve(__dirname, `../dist/JSON/${item['Item Number']}.json`)
-          );
-          itemList.push(data);
+          workbook = XLSX.read(xlsxFile, { type: 'buffer' });
         } catch (e) {
           reject(e);
-          
         }
-        if (sheet.length === itemList.length) {
-          await Sheet.findByIdAndRemove(storedSheet._id);
-          resolve('SHEET UPLOADED TO SERVER AND REMOVED FROM DB')
-          
-        }
-      });
-    });
+        const sheet_name_list = workbook.SheetNames;
+        sheet_name_list.forEach(y => {
+          const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+          let itemList = [];
+          sheet.forEach(async (item, i) => {
+            try {
+              await fs.outputJson(
+                path.resolve(
+                  __dirname,
+                  `../dist/JSON/${item['Item Number']}.json`
+                ),
+                item
+              );
+              const data = await fs.readJson(
+                path.resolve(
+                  __dirname,
+                  `../dist/JSON/${item['Item Number']}.json`
+                )
+              );
+              itemList.push(data);
+            } catch (e) {
+              reject(e);
+            }
+            const string = `${(itemList.length / sheet.length * 100).toFixed(
+              2
+            )} %  -  sheet completed`;
+            process.stdout.write(`${string}\r`);
+            if (sheet.length === itemList.length) {
+              await Sheet.findByIdAndRemove(storedSheet._id);
+              resolve(sheet);
+            }
+          });
+        });
       } else {
-        resolve('SHEET CURRENTLY BUILDING')
+        resolve('SHEET CURRENTLY BUILDING');
       }
     } else if (storedData.length === 0) {
-      resolve('NO SHEETS IN DB')
-    
+      resolve('NO SHEETS IN DB');
     }
-  })
+  });
 };
 
-
 const runApi = async () => {
-  const sheetRes = await fetchSheet();
-  console.log(sheetRes);
-  const listRes = await listToJSON();
-  console.log(listRes);
+  const sheetRes = await fetchSheet().catch(err => {
+    console.log(err);
+    process.exit(1);
+  });
+  if (Array.isArray(sheetRes)) {
+    console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
+    const listRes = await listToJSON(sheetRes).catch(err => {
+      console.log(err);
+      process.exit(1);
+    });
+    if (listRes === 'success') {
+      console.log('LISTS CREATED');
+      process.exit(0);
+    }
+  } else {
+    console.log(sheetRes);
+    process.exit(0);
+  }
 };
 
 runApi();
