@@ -94,7 +94,7 @@ const listToJSON = () => {
             updatedProduct.updatedName = p;
           });
           delete updatedProduct['properties'];
-          updatedProducts.push(product);
+          updatedProducts.push(updatedProduct);
         });
 
         const productPages = Math.ceil(
@@ -124,7 +124,7 @@ const listToJSON = () => {
                   updatedProduct.updatedName = p;
                 });
                 delete updatedProduct['properties'];
-                updatedProducts.push(product);
+                updatedProducts.push(updatedProduct);
               });
             }
           }
