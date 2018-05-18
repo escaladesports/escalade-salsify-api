@@ -96,22 +96,19 @@ const listToJSON = () => {
             );
             switch (p.data_type) {
               case 'digital_asset':
-                updatedProduct[updatedName] =
-                  p.values.length > 1
-                    ? p.values.map(value => value.large_url)
-                    : p.values[0].large_url;
+                updatedProduct[updatedName] = p.values.map(
+                  value => value.large_url
+                );
                 return;
               case 'string':
-                updatedProduct[updatedName] =
-                  p.values.length > 1
-                    ? p.values.map(value => value.name || value.id)
-                    : p.values[0].name;
+                p.values.length > 1
+                  ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
+                      value => value.name || value.id
+                    ))
+                  : (updatedName[updatedname] = p.values[0].name);
                 return;
               default:
-                updatedProduct[updatedName] =
-                  p.values.length > 1
-                    ? p.values.map(value => value.name || value.id)
-                    : p.values[0].name;
+                updatedName[updatedname] = p;
                 return;
             }
           });
@@ -149,22 +146,19 @@ const listToJSON = () => {
 
                   switch (p.data_type) {
                     case 'digital_asset':
-                      updatedProduct[updatedName] =
-                        p.values.length > 1
-                          ? p.values.map(value => value.large_url)
-                          : p.values[0].large_url;
+                      updatedProduct[updatedName] = p.values.map(
+                        value => value.large_url
+                      );
                       return;
                     case 'string':
-                      updatedProduct[updatedName] =
-                        p.values.length > 1
-                          ? p.values.map(value => value.name || value.id)
-                          : p.values[0].name;
+                      p.values.length > 1
+                        ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
+                            value => value.name || value.id
+                          ))
+                        : (updatedName[updatedname] = p.values[0].name);
                       return;
                     default:
-                      updatedProduct[updatedName] =
-                        p.values.length > 1
-                          ? p.values.map(value => value.name || value.id)
-                          : p.values[0].name;
+                      updatedName[updatedname] = p;
                       return;
                   }
                 });
@@ -185,7 +179,7 @@ const listToJSON = () => {
           console.log(`${string}`);
         }
         await fs.outputJson(
-          path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
+          path.resolve(__dirname, `../dist/lists/${name}.json`),
           updatedProducts
         );
         if (productList.length === brandList.length) {

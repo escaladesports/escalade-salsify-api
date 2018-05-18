@@ -96,22 +96,21 @@ const listToJSON = () => {
             );
             switch (p.data_type) {
               case 'digital_asset':
-                updatedProduct[updatedName] =
-                  p.values.length > 1
-                    ? p.values.map(value => value.large_url)
-                    : p.values[0].large_url;
+                updatedProduct[updatedName] = p.values.map(
+                  value => value.large_url
+                );
                 return;
               case 'string':
+                console.log(updatedName);
                 updatedProduct[updatedName] =
                   p.values.length > 1
                     ? p.values.map(value => value.name || value.id)
                     : p.values[0].name;
                 return;
               default:
-                updatedProduct[updatedName] =
-                  p.values.length > 1
-                    ? p.values.map(value => value.name || value.id)
-                    : p.values[0].name;
+                updatedProduct[updatedName] = p.values.map(
+                  value => value.name || value.id
+                );
                 return;
             }
           });
