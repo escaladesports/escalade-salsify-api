@@ -102,13 +102,13 @@ const listToJSON = () => {
                     : p.values[0].large_url;
                 return;
               case 'string':
-                updatedProduct[updatedname] =
+                updatedProduct[updatedName] =
                   p.values.length > 1
                     ? p.values.map(value => value.name || value.id)
                     : p.values[0].name;
                 return;
               default:
-                updatedProduct[updatedname] =
+                updatedProduct[updatedName] =
                   p.values.length > 1
                     ? p.values.map(value => value.name || value.id)
                     : p.values[0].name;
@@ -155,13 +155,13 @@ const listToJSON = () => {
                           : p.values[0].large_url;
                       return;
                     case 'string':
-                      updatedProduct[updatedname] =
+                      updatedProduct[updatedName] =
                         p.values.length > 1
                           ? p.values.map(value => value.name || value.id)
                           : p.values[0].name;
                       return;
                     default:
-                      updatedProduct[updatedname] =
+                      updatedProduct[updatedName] =
                         p.values.length > 1
                           ? p.values.map(value => value.name || value.id)
                           : p.values[0].name;

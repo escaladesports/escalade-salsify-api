@@ -72,7 +72,7 @@ const listToJSON = () => {
         const products = await fetch(
           `${options.baseUrl}/products?filter==list:${
             list.id
-          }&per_page=250&view=6184`,
+          }&per_page=250&view=30478`,
           {
             method: 'GET',
             headers: options.headers
@@ -88,16 +88,32 @@ const listToJSON = () => {
         products.products.map(product => {
           let updatedProduct = { ...product };
           product.properties.forEach(p => {
-            if (p.values.length === 0) return;
-
+            if (p.values.length === 0) {
+              return;
+            }
             let updatedName = camelCase(
               p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
             );
-
-            updatedProduct[updatedName] =
-              p.values.length > 1
-                ? p.values.map(value => value.id || value.name)
-                : p.values[0].id || p.values[0].name;
+            switch (p.data_type) {
+              case 'digital_asset':
+                updatedProduct[updatedName] =
+                  p.values.length > 1
+                    ? p.values.map(value => value.large_url)
+                    : p.values[0].large_url;
+                return;
+              case 'string':
+                updatedProduct[updatedName] =
+                  p.values.length > 1
+                    ? p.values.map(value => value.name || value.id)
+                    : p.values[0].name;
+                return;
+              default:
+                updatedProduct[updatedName] =
+                  p.values.length > 1
+                    ? p.values.map(value => value.name || value.id)
+                    : p.values[0].name;
+                return;
+            }
           });
           delete updatedProduct['properties'];
           updatedProducts.push(updatedProduct);
@@ -112,7 +128,7 @@ const listToJSON = () => {
             const response = await fetch(
               `${options.baseUrl}/products?filter==list:${
                 list.id
-              }&per_page=250&view=6184&page=${i}`,
+              }&per_page=250&view=30478&page=${i}`,
               {
                 method: 'GET',
                 headers: options.headers
@@ -131,10 +147,26 @@ const listToJSON = () => {
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
 
-                  updatedProduct[updatedName] =
-                    p.values.length > 1
-                      ? p.values.map(value => value.id || value.name)
-                      : p.values[0].id || p.values[0].name;
+                  switch (p.data_type) {
+                    case 'digital_asset':
+                      updatedProduct[updatedName] =
+                        p.values.length > 1
+                          ? p.values.map(value => value.large_url)
+                          : p.values[0].large_url;
+                      return;
+                    case 'string':
+                      updatedProduct[updatedName] =
+                        p.values.length > 1
+                          ? p.values.map(value => value.name || value.id)
+                          : p.values[0].name;
+                      return;
+                    default:
+                      updatedProduct[updatedName] =
+                        p.values.length > 1
+                          ? p.values.map(value => value.name || value.id)
+                          : p.values[0].name;
+                      return;
+                  }
                 });
                 delete updatedProduct['properties'];
                 updatedProducts.push(updatedProduct);
