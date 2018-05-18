@@ -105,10 +105,10 @@ const listToJSON = () => {
                   ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
                       value => value.name || value.id
                     ))
-                  : (updatedName[updatedname] = p.values[0].name);
+                  : (updatedProduct[updatedName] = p.values[0].name);
                 return;
               default:
-                updatedName[updatedname] = p;
+                updatedProduct[updatedName] = p;
                 return;
             }
           });
@@ -155,10 +155,10 @@ const listToJSON = () => {
                         ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
                             value => value.name || value.id
                           ))
-                        : (updatedName[updatedname] = p.values[0].name);
+                        : (updatedProduct[updatedName] = p.values[0].name);
                       return;
                     default:
-                      updatedName[updatedname] = p;
+                      updatedProduct[updatedName] = p;
                       return;
                   }
                 });
