@@ -7,8 +7,9 @@ import fetch from 'isomorphic-fetch';
 import axios from 'axios';
 import { connectToDatabase } from '../utils/db';
 import Sheet from '../models/Sheet';
+import camelCase from 'camelcase';
 
-const listToJSON = jsonSheet => {
+const listToJSON = () => {
   const listPerPage = 250;
   const options = {
     baseUrl: `https://app.salsify.com/api/orgs/${process.env.SALSIFY_ORG_ID}`,
@@ -22,10 +23,6 @@ const listToJSON = jsonSheet => {
   };
 
   return new Promise(async (resolve, reject) => {
-    if (!Array.isArray(jsonSheet)) {
-      reject('Wrong Sheet Format');
-      return;
-    }
     let updatedList = [];
 
     const res = await fetch(options.url, {
@@ -75,22 +72,15 @@ const listToJSON = jsonSheet => {
           .catch(err => reject(err));
 
         products.products.map(product => {
-          let foundItem = jsonSheet.find(
-            item =>
-              item['Item Number'].toLowerCase() === product.id.toLowerCase()
-          );
-          if (foundItem) {
-            const keys = Object.keys(foundItem);
-            const webImageKeys = keys.filter(key => key.match(/Web Images/g));
-            let webImages = [];
-            webImageKeys.forEach(key => {
-              webImages.push(foundItem[key]);
-            });
-            foundItem.webImages = webImages;
-            updatedProducts.push(foundItem);
-          } else {
-            updatedProducts.push(product);
-          }
+          let updatedProduct = { ...product };
+          product.properties.forEach(p => {
+            let updatedName = camelCase(
+              p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
+            );
+            updatedProduct.updatedName = p;
+          });
+          delete updatedProduct['properties'];
+          updatedProducts.push(product);
         });
 
         const productPages = Math.ceil(
@@ -112,25 +102,15 @@ const listToJSON = jsonSheet => {
               .catch(err => reject(err));
             if (response) {
               response.products.map(product => {
-                let foundItem = jsonSheet.find(
-                  item =>
-                    item['Item Number'].toLowerCase() ===
-                    product.id.toLowerCase()
-                );
-                if (foundItem) {
-                  const keys = Object.keys(foundItem);
-                  const webImageKeys = keys.filter(key =>
-                    key.match(/Web Images/g)
+                let updatedProduct = { ...product };
+                product.properties.forEach(p => {
+                  let updatedName = camelCase(
+                    p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
-                  let webImages = [];
-                  webImageKeys.forEach(key => {
-                    webImages.push(foundItem[key]);
-                  });
-                  foundItem.webImages = webImages;
-                  updatedProducts.push(foundItem);
-                } else {
-                  updatedProducts.push(product);
-                }
+                  updatedProduct.updatedName = p;
+                });
+                delete updatedProduct['properties'];
+                updatedProducts.push(product);
               });
             }
           }
@@ -226,7 +206,7 @@ const runApi = async () => {
   });
   if (Array.isArray(sheetRes)) {
     console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
-    const listRes = await listToJSON(sheetRes).catch(err => {
+    const listRes = await listToJSON().catch(err => {
       console.log(err);
       process.exit(1);
     });
