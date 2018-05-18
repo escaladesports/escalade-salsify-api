@@ -122,12 +122,17 @@ const listToJSON = () => {
         if (updatedProducts.length === products.meta.total_entries) {
           productList.push(updatedProducts);
         }
-        const string = `${(
+        const progress = (
           productList.length /
           updatedList.length *
           100
-        ).toFixed(2)} %  -  lists completed`;
-        console.log(`${string}`);
+        ).toFixed(2);
+        for (let i = 0; i <= 100; i += 5) {
+          if (i === Math.round(progress)) {
+            const string = `${progress} %  -  lists completed`;
+            console.log(`${string}`);
+          }
+        }
 
         if (productList.length === updatedList.length) {
           resolve('success');
@@ -180,10 +185,18 @@ const fetchSheet = () => {
             } catch (e) {
               reject(e);
             }
-            const string = `${(itemList.length / sheet.length * 100).toFixed(
-              2
-            )} %  -  sheet completed`;
-            console.log(`${string}\r`);
+            const progress = (
+              productList.length /
+              updatedList.length *
+              100
+            ).toFixed(2);
+            for (let i = 0; i <= 100; i += 5) {
+              if (i === Math.round(progress)) {
+                const string = `${progress} %  -  sheet completed`;
+                console.log(`${string}`);
+              }
+            }
+
             if (sheet.length === itemList.length) {
               await Sheet.findByIdAndRemove(storedSheet._id);
               resolve(sheet);
