@@ -85,7 +85,6 @@ const listToJSON = jsonSheet => {
             let webImages = [];
             webImageKeys.forEach(key => {
               webImages.push(foundItem[key]);
-              delete foundItem[key];
             });
             foundItem.webImages = webImages;
             updatedProducts.push(foundItem);
@@ -126,7 +125,6 @@ const listToJSON = jsonSheet => {
                   let webImages = [];
                   webImageKeys.forEach(key => {
                     webImages.push(foundItem[key]);
-                    delete foundItem[key];
                   });
                   foundItem.webImages = webImages;
                   updatedProducts.push(foundItem);
@@ -149,7 +147,6 @@ const listToJSON = jsonSheet => {
           updatedList.length *
           100
         ).toFixed(2)} %  -  lists completed`;
-        console.clear();
         console.log(`${string}`);
 
         if (productList.length === updatedList.length) {
