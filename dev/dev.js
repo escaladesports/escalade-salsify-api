@@ -159,6 +159,7 @@ const fetchSheet = async () => {
         sheet_name_list.forEach(y => {
           const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
           let itemList = [];
+          let sheetProgress = 0;
           sheet.forEach(async (item, i) => {
             try {
               await fs.outputJson(
@@ -178,15 +179,19 @@ const fetchSheet = async () => {
             } catch (e) {
               reject(e);
             }
-            const string = `${(itemList.length / sheet.length * 100).toFixed(
-              2
-            )} %  -  sheet completed`;
-            process.stdout.write(`${string}`);
+            sheetProgress = (itemList.length / sheet.length * 100).toFixed(2);
+            // const string = `${(itemList.length / sheet.length * 100).toFixed(
+            //   2
+            // )} %  -  sheet completed`;
+            // process.stdout.write(`${string}\r`);
             if (sheet.length === itemList.length) {
               await Sheet.findByIdAndRemove(storedSheet._id);
               resolve(sheet);
             }
           });
+          if (sheetProgress >= 25 && sheetProgress <= 26) {
+            console.log(sheetProgress);
+          }
         });
       } else {
         resolve('SHEET CURRENTLY BUILDING');
