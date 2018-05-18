@@ -181,7 +181,7 @@ const fetchSheet = async () => {
             const string = `${(itemList.length / sheet.length * 100).toFixed(
               2
             )} %  -  sheet completed`;
-            process.stdout.write(`${string}\r`);
+            process.stdout.write(`${string}`);
             if (sheet.length === itemList.length) {
               await Sheet.findByIdAndRemove(storedSheet._id);
               resolve(sheet);
