@@ -91,7 +91,7 @@ const listToJSON = () => {
             let updatedName = camelCase(
               p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
             );
-            updatedProduct.updatedName = p;
+            updatedProduct[updatedName] = p;
           });
           delete updatedProduct['properties'];
           updatedProducts.push(updatedProduct);
@@ -121,7 +121,7 @@ const listToJSON = () => {
                   let updatedName = camelCase(
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
-                  updatedProduct.updatedName = p;
+                  updatedProduct[updatedName] = p;
                 });
                 delete updatedProduct['properties'];
                 updatedProducts.push(updatedProduct);
