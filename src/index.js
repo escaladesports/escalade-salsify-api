@@ -209,23 +209,16 @@ const fetchSheet = () => {
 };
 
 const runApi = async () => {
-  const sheetRes = await fetchSheet().catch(err => {
+  const listRes = await listToJSON().catch(err => {
     console.log(err);
     process.exit(1);
   });
-  if (Array.isArray(sheetRes)) {
-    console.log('SHEET UPLOADED TO SERVER AND REMOVED FROM DB');
-    const listRes = await listToJSON().catch(err => {
-      console.log(err);
-      process.exit(1);
-    });
-    if (listRes === 'success') {
-      console.log('LISTS CREATED');
-      process.exit(0);
-    }
-  } else {
-    console.log(sheetRes);
+  if (listRes === 'success') {
+    console.log('LISTS CREATED');
     process.exit(0);
+  } else {
+    console.log(listRes);
+    process.exit(1);
   }
 };
 
