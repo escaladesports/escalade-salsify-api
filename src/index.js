@@ -127,7 +127,7 @@ const listToJSON = () => {
           updatedList.length *
           100
         ).toFixed(2);
-        for (let i = 0; i <= 100; i += 5) {
+        for (let i = 0; i <= 100; i += 10) {
           if (i === Math.round(progress)) {
             const string = `${progress} %  -  lists completed`;
             console.log(`${string}`);
@@ -186,7 +186,7 @@ const fetchSheet = () => {
               reject(e);
             }
             const progress = (itemList.length / sheet.length * 100).toFixed(2);
-            for (let i = 0; i <= 100; i += 5) {
+            for (let i = 0; i <= 100; i += 10) {
               if (i === Math.round(progress)) {
                 const string = `${progress} %  -  sheet completed`;
                 console.log(`${string}`);
