@@ -72,7 +72,7 @@ const listToJSON = () => {
         const products = await fetch(
           `${options.baseUrl}/products?filter==list:${
             list.id
-          }&per_page=250&view=6184`,
+          }&per_page=250&view=30478`,
           {
             method: 'GET',
             headers: options.headers
@@ -88,16 +88,17 @@ const listToJSON = () => {
         products.products.map(product => {
           let updatedProduct = { ...product };
           product.properties.forEach(p => {
+            if (p.values.length === 0) {
+              return;
+            }
             let updatedName = camelCase(
               p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
             );
-            if (updatedProduct.itemName) {
-              updatedProduct.name = updatedProduct.itemName.values[0].name;
-            }
+
             updatedProduct[updatedName] =
               p.values.length > 1
-                ? p.values.map(value => value.id)
-                : p.values[0].id;
+                ? p.values.map(value => value.id || value.name)
+                : p.values[0].id || p.values[0].name;
           });
           delete updatedProduct['properties'];
           updatedProducts.push(updatedProduct);
@@ -112,7 +113,7 @@ const listToJSON = () => {
             const response = await fetch(
               `${options.baseUrl}/products?filter==list:${
                 list.id
-              }&per_page=250&view=6184&page=${i}`,
+              }&per_page=250&view=30478&page=${i}`,
               {
                 method: 'GET',
                 headers: options.headers
@@ -124,17 +125,17 @@ const listToJSON = () => {
               response.products.map(product => {
                 let updatedProduct = { ...product };
                 product.properties.forEach(p => {
+                  if (p.values.length === 0) {
+                    return;
+                  }
                   let updatedName = camelCase(
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
-                  if (updatedProduct.itemName) {
-                    updatedProduct.name =
-                      updatedProduct.itemName.values[0].name;
-                  }
+
                   updatedProduct[updatedName] =
                     p.values.length > 1
-                      ? p.values.map(value => value.id)
-                      : p.values[0].id;
+                      ? p.values.map(value => value.id || value.name)
+                      : p.values[0].id || p.values[0].name;
                 });
                 delete updatedProduct['properties'];
                 updatedProducts.push(updatedProduct);

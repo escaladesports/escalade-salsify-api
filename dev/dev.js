@@ -88,11 +88,16 @@ const listToJSON = () => {
         products.products.map(product => {
           let updatedProduct = { ...product };
           product.properties.forEach(p => {
+            if (p.values.length === 0) return;
+
             let updatedName = camelCase(
               p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
             );
-            console.log(updatedProduct.itemName);
-            updatedProduct[updatedName] = p;
+
+            updatedProduct[updatedName] =
+              p.values.length > 1
+                ? p.values.map(value => value.id || value.name)
+                : p.values[0].id || p.values[0].name;
           });
           delete updatedProduct['properties'];
           updatedProducts.push(updatedProduct);
@@ -119,10 +124,17 @@ const listToJSON = () => {
               response.products.map(product => {
                 let updatedProduct = { ...product };
                 product.properties.forEach(p => {
+                  if (p.values.length === 0) {
+                    return;
+                  }
                   let updatedName = camelCase(
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
-                  updatedProduct[updatedName] = p;
+
+                  updatedProduct[updatedName] =
+                    p.values.length > 1
+                      ? p.values.map(value => value.id || value.name)
+                      : p.values[0].id || p.values[0].name;
                 });
                 delete updatedProduct['properties'];
                 updatedProducts.push(updatedProduct);
