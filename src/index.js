@@ -8,6 +8,7 @@ import axios from 'axios';
 import { connectToDatabase } from '../utils/db';
 import Sheet from '../models/Sheet';
 import camelCase from 'camelcase';
+import brandList from '../list.json';
 
 const listToJSON = () => {
   const listPerPage = 250;
@@ -53,22 +54,35 @@ const listToJSON = () => {
       }
     }
     let productList = [];
-
     if (updatedList.length > 0) {
-      updatedList.forEach(async (list, index) => {
+      const selectedList = updatedList.filter(l => {
+        const name = l.name
+          .replace(/^\s+|[^\s\w]+|\s+$/g, '')
+          .replace(/\s+/g, '-')
+          .toLowerCase();
+        return brandList.includes(name);
+      });
+
+      selectedList.forEach(async (list, index) => {
         let updatedProducts = [];
         const name = list.name
           .replace(/^\s+|[^\s\w]+|\s+$/g, '')
           .replace(/\s+/g, '-')
           .toLowerCase();
         const products = await fetch(
-          `${options.baseUrl}/products?filter==list:${list.id}&per_page=250`,
+          `${options.baseUrl}/products?filter==list:${
+            list.id
+          }&per_page=250&view=6184`,
           {
             method: 'GET',
             headers: options.headers
           }
         )
-          .then(res => res.json())
+          .then(res => {
+            if (res.status === 200) {
+              return res.json();
+            }
+          })
           .catch(err => reject(err));
 
         products.products.map(product => {
@@ -92,7 +106,7 @@ const listToJSON = () => {
             const response = await fetch(
               `${options.baseUrl}/products?filter==list:${
                 list.id
-              }&per_page=250&page=${i}`,
+              }&per_page=250&view=6184&page=${i}`,
               {
                 method: 'GET',
                 headers: options.headers
@@ -115,95 +129,24 @@ const listToJSON = () => {
             }
           }
         }
+        if (updatedProducts.length === products.meta.total_entries) {
+          productList.push(updatedProducts);
+          const progress = (
+            productList.length /
+            brandList.length *
+            100
+          ).toFixed(2);
+          const string = `${progress} %  -  lists completed`;
+          console.log(`${string}`);
+        }
         await fs.outputJson(
           path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
           updatedProducts
         );
-        if (updatedProducts.length === products.meta.total_entries) {
-          productList.push(updatedProducts);
-        }
-        const progress = (
-          productList.length /
-          updatedList.length *
-          100
-        ).toFixed(2);
-        for (let i = 0; i <= 100; i += 10) {
-          if (i === Math.round(progress)) {
-            const string = `${progress} %  -  lists completed`;
-            console.log(`${string}`);
-          }
-        }
-
-        if (productList.length === updatedList.length) {
+        if (productList.length === brandList.length) {
           resolve('success');
         }
       });
-    }
-  });
-};
-
-const fetchSheet = () => {
-  return new Promise(async (resolve, reject) => {
-    await connectToDatabase();
-    const storedData = await Sheet.find({});
-    if (storedData.length > 0) {
-      const storedSheet = storedData[0];
-      if (storedSheet.status === 'completed' && storedSheet.url !== null) {
-        const res = await fetch(storedSheet.url).then(res => res);
-        if (res.status === 403) {
-          await Sheet.findByIdAndRemove(storedSheet._id);
-          resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
-          return;
-        }
-        const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
-        let workbook;
-        try {
-          workbook = XLSX.read(xlsxFile, { type: 'buffer' });
-        } catch (e) {
-          reject(e);
-        }
-        const sheet_name_list = workbook.SheetNames;
-        sheet_name_list.forEach(y => {
-          const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-          let itemList = [];
-          sheet.forEach(async (item, i) => {
-            try {
-              await fs.outputJson(
-                path.resolve(
-                  __dirname,
-                  `../dist/JSON/${item['Item Number']}.json`
-                ),
-                item
-              );
-              const data = await fs.readJson(
-                path.resolve(
-                  __dirname,
-                  `../dist/JSON/${item['Item Number']}.json`
-                )
-              );
-              itemList.push(data);
-            } catch (e) {
-              reject(e);
-            }
-            const progress = (itemList.length / sheet.length * 100).toFixed(2);
-            for (let i = 0; i <= 100; i += 10) {
-              if (i === Math.round(progress)) {
-                const string = `${progress} %  -  sheet completed`;
-                console.log(`${string}`);
-              }
-            }
-
-            if (sheet.length === itemList.length) {
-              await Sheet.findByIdAndRemove(storedSheet._id);
-              resolve(sheet);
-            }
-          });
-        });
-      } else {
-        resolve('SHEET CURRENTLY BUILDING');
-      }
-    } else if (storedData.length === 0) {
-      resolve('NO SHEETS IN DB');
     }
   });
 };
@@ -223,3 +166,69 @@ const runApi = async () => {
 };
 
 runApi();
+
+// const fetchSheet = () => {
+//   return new Promise(async (resolve, reject) => {
+//     await connectToDatabase();
+//     const storedData = await Sheet.find({});
+//     if (storedData.length > 0) {
+//       const storedSheet = storedData[0];
+//       if (storedSheet.status === 'completed' && storedSheet.url !== null) {
+//         const res = await fetch(storedSheet.url).then(res => res);
+//         if (res.status === 403) {
+//           await Sheet.findByIdAndRemove(storedSheet._id);
+//           resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
+//           return;
+//         }
+//         const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
+//         let workbook;
+//         try {
+//           workbook = XLSX.read(xlsxFile, { type: 'buffer' });
+//         } catch (e) {
+//           reject(e);
+//         }
+//         const sheet_name_list = workbook.SheetNames;
+//         sheet_name_list.forEach(y => {
+//           const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+//           let itemList = [];
+//           sheet.forEach(async (item, i) => {
+//             try {
+//               await fs.outputJson(
+//                 path.resolve(
+//                   __dirname,
+//                   `../dist/JSON/${item['Item Number']}.json`
+//                 ),
+//                 item
+//               );
+//               const data = await fs.readJson(
+//                 path.resolve(
+//                   __dirname,
+//                   `../dist/JSON/${item['Item Number']}.json`
+//                 )
+//               );
+//               itemList.push(data);
+//             } catch (e) {
+//               reject(e);
+//             }
+//             const progress = (itemList.length / sheet.length * 100).toFixed(2);
+//             for (let i = 0; i <= 100; i += 25) {
+//               if (i === Math.round(progress)) {
+//                 const string = `${progress} %  -  sheet completed`;
+//                 console.log(`${string}`);
+//               }
+//             }
+
+//             if (sheet.length === itemList.length) {
+//               await Sheet.findByIdAndRemove(storedSheet._id);
+//               resolve(sheet);
+//             }
+//           });
+//         });
+//       } else {
+//         resolve('SHEET CURRENTLY BUILDING');
+//       }
+//     } else if (storedData.length === 0) {
+//       resolve('NO SHEETS IN DB');
+//     }
+//   });
+// };
