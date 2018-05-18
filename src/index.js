@@ -94,8 +94,26 @@ const listToJSON = () => {
             let updatedName = camelCase(
               p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
             );
-
-            updatedProduct[updatedName] = p;
+            switch (p.data_type) {
+              case 'digital_asset':
+                updatedProduct[updatedName] =
+                  p.values.length > 1
+                    ? p.values.map(value => value.large_url)
+                    : values[0].large_url;
+                return;
+              case 'string':
+                updatedProduct[updatedname] =
+                  p.values.length > 1
+                    ? values.map(value => value.name || value.id)
+                    : values[0].name;
+                return;
+              default:
+                updatedProduct[updatedname] =
+                  p.values.length > 1
+                    ? values.map(value => value.name || value.id)
+                    : values[0].name;
+                return;
+            }
           });
           delete updatedProduct['properties'];
           updatedProducts.push(updatedProduct);
@@ -129,7 +147,26 @@ const listToJSON = () => {
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
 
-                  updatedProduct[updatedName] = p;
+                  switch (p.data_type) {
+                    case 'digital_asset':
+                      updatedProduct[updatedName] =
+                        p.values.length > 1
+                          ? p.values.map(value => value.large_url)
+                          : values[0].large_url;
+                      return;
+                    case 'string':
+                      updatedProduct[updatedname] =
+                        p.values.length > 1
+                          ? values.map(value => value.name || value.id)
+                          : values[0].name;
+                      return;
+                    default:
+                      updatedProduct[updatedname] =
+                        p.values.length > 1
+                          ? values.map(value => value.name || value.id)
+                          : values[0].name;
+                      return;
+                  }
                 });
                 delete updatedProduct['properties'];
                 updatedProducts.push(updatedProduct);
