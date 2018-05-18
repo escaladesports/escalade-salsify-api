@@ -145,7 +145,7 @@ const listToJSON = () => {
         }
         const productProgress = (
           updatedProducts.length /
-          product.meta.total_entries *
+          products.meta.total_entries *
           100
         ).toFixed(2);
         const productProgressString = `${productProgress} % - of products built`;
