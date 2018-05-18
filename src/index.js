@@ -74,14 +74,25 @@ const listToJSON = jsonSheet => {
           .then(res => res.json())
           .catch(err => reject(err));
 
-        products.products.map(product =>
-          updatedProducts.push(
-            jsonSheet.find(
-              item =>
-                item['Item Number'].toLowerCase() === product.id.toLowerCase()
-            ) || product
-          )
-        );
+        products.products.map(product => {
+          let foundItem = jsonSheet.find(
+            item =>
+              item['Item Number'].toLowerCase() === product.id.toLowerCase()
+          );
+          if (foundItem) {
+            const keys = Object.keys(foundItem);
+            const webImageKeys = keys.filter(key => key.match(/Web Images/g));
+            let webImages = [];
+            webImageKeys.forEach(key => {
+              webImages.push(foundItem[key]);
+              delete foundItem[key];
+            });
+            foundItem.webImages = webImages;
+            updatedProducts.push(foundItem);
+          } else {
+            updatedProducts.push(product);
+          }
+        });
 
         const productPages = Math.ceil(
           products.meta.total_entries / products.meta.per_page
@@ -101,15 +112,28 @@ const listToJSON = jsonSheet => {
               .then(response => response.json())
               .catch(err => reject(err));
             if (response) {
-              response.products.map(product =>
-                updatedProducts.push(
-                  jsonSheet.find(
-                    item =>
-                      item['Item Number'].toLowerCase() ===
-                      product.id.toLowerCase()
-                  ) || product
-                )
-              );
+              response.products.map(product => {
+                let foundItem = jsonSheet.find(
+                  item =>
+                    item['Item Number'].toLowerCase() ===
+                    product.id.toLowerCase()
+                );
+                if (foundItem) {
+                  const keys = Object.keys(foundItem);
+                  const webImageKeys = keys.filter(key =>
+                    key.match(/Web Images/g)
+                  );
+                  let webImages = [];
+                  webImageKeys.forEach(key => {
+                    webImages.push(foundItem[key]);
+                    delete foundItem[key];
+                  });
+                  foundItem.webImages = webImages;
+                  updatedProducts.push(foundItem);
+                } else {
+                  updatedProducts.push(product);
+                }
+              });
             }
           }
         }
