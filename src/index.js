@@ -185,7 +185,7 @@ const listToJSON = () => {
           console.log(`${string}`);
         }
         await fs.outputJson(
-          path.resolve(__dirname, `../dist/JSON/lists/${name}.json`),
+          path.resolve(__dirname, `../dist/lists/${name}.json`),
           updatedProducts
         );
         if (productList.length === brandList.length) {
