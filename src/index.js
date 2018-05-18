@@ -95,10 +95,7 @@ const listToJSON = () => {
               p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
             );
 
-            updatedProduct[updatedName] =
-              p.values.length > 1
-                ? p.values.map(value => value.id || value.name)
-                : p.values[0].id || p.values[0].name;
+            updatedProduct[updatedName] = p;
           });
           delete updatedProduct['properties'];
           updatedProducts.push(updatedProduct);
@@ -132,10 +129,7 @@ const listToJSON = () => {
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
 
-                  updatedProduct[updatedName] =
-                    p.values.length > 1
-                      ? p.values.map(value => value.id || value.name)
-                      : p.values[0].id || p.values[0].name;
+                  updatedProduct[updatedName] = p;
                 });
                 delete updatedProduct['properties'];
                 updatedProducts.push(updatedProduct);
@@ -143,13 +137,6 @@ const listToJSON = () => {
             }
           }
         }
-        const productProgress = (
-          updatedProducts.length /
-          products.meta.total_entries *
-          100
-        ).toFixed(2);
-        const productProgressString = `${productProgress} % - of products built`;
-        console.log(`${productProgressString}`);
         if (updatedProducts.length === products.meta.total_entries) {
           productList.push(updatedProducts);
           const progress = (
