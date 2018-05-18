@@ -8,7 +8,7 @@ import axios from 'axios';
 import { connectToDatabase } from '../utils/db';
 import Sheet from '../models/Sheet';
 
-const listToJSON = async jsonSheet => {
+const listToJSON = jsonSheet => {
   const listPerPage = 250;
   const options = {
     baseUrl: `https://app.salsify.com/api/orgs/${process.env.SALSIFY_ORG_ID}`,
@@ -135,7 +135,7 @@ const listToJSON = async jsonSheet => {
   });
 };
 
-const fetchSheet = async () => {
+const fetchSheet = () => {
   return new Promise(async (resolve, reject) => {
     await connectToDatabase();
     const storedData = await Sheet.find({});
