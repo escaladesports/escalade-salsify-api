@@ -185,11 +185,7 @@ const fetchSheet = () => {
             } catch (e) {
               reject(e);
             }
-            const progress = (
-              productList.length /
-              updatedList.length *
-              100
-            ).toFixed(2);
+            const progress = (itemList.length / sheet.length * 100).toFixed(2);
             for (let i = 0; i <= 100; i += 5) {
               if (i === Math.round(progress)) {
                 const string = `${progress} %  -  sheet completed`;
