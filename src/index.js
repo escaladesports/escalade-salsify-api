@@ -125,7 +125,7 @@ const listToJSON = jsonSheet => {
           updatedList.length *
           100
         ).toFixed(2)} %  -  lists completed`;
-        process.stdout.write(`${string}\r`);
+        console.log(`${string}`);
 
         if (productList.length === updatedList.length) {
           resolve('success');
@@ -181,7 +181,7 @@ const fetchSheet = () => {
             const string = `${(itemList.length / sheet.length * 100).toFixed(
               2
             )} %  -  sheet completed`;
-            process.stdout.write(`${string}\r`);
+            console.log(`${string}`);
             if (sheet.length === itemList.length) {
               await Sheet.findByIdAndRemove(storedSheet._id);
               resolve(sheet);
