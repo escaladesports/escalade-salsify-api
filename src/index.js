@@ -92,9 +92,12 @@ const listToJSON = () => {
               p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
             );
             if (updatedProduct.itemName) {
-              updatedProduct.name = updatedProduct.itemName.values.name;
+              updatedProduct.name = updatedProduct.itemName.values[0].name;
             }
-            updatedProduct[updatedName] = p;
+            updatedProduct[updatedName] =
+              p.values.length > 1
+                ? p.values.map(value => value.id)
+                : p.values[0].id;
           });
           delete updatedProduct['properties'];
           updatedProducts.push(updatedProduct);
@@ -125,9 +128,13 @@ const listToJSON = () => {
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   );
                   if (updatedProduct.itemName) {
-                    updatedProduct.name = updatedProduct.itemName.values.name;
+                    updatedProduct.name =
+                      updatedProduct.itemName.values[0].name;
                   }
-                  updatedProduct[updatedName] = p;
+                  updatedProduct[updatedName] =
+                    p.values.length > 1
+                      ? p.values.map(value => value.id)
+                      : p.values[0].id;
                 });
                 delete updatedProduct['properties'];
                 updatedProducts.push(updatedProduct);
