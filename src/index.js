@@ -143,6 +143,13 @@ const listToJSON = () => {
             }
           }
         }
+        const productProgress = (
+          updatedProducts.length /
+          product.meta.total_entries *
+          100
+        ).toFixed(2);
+        const productProgressString = `${productProgress} % - of products built`;
+        console.log(`${productProgressString}`);
         if (updatedProducts.length === products.meta.total_entries) {
           productList.push(updatedProducts);
           const progress = (
