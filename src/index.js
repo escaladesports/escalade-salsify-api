@@ -99,19 +99,19 @@ const listToJSON = () => {
                 updatedProduct[updatedName] =
                   p.values.length > 1
                     ? p.values.map(value => value.large_url)
-                    : values[0].large_url;
+                    : p.values[0].large_url;
                 return;
               case 'string':
                 updatedProduct[updatedname] =
                   p.values.length > 1
-                    ? values.map(value => value.name || value.id)
-                    : values[0].name;
+                    ? p.values.map(value => value.name || value.id)
+                    : p.values[0].name;
                 return;
               default:
                 updatedProduct[updatedname] =
                   p.values.length > 1
-                    ? values.map(value => value.name || value.id)
-                    : values[0].name;
+                    ? p.values.map(value => value.name || value.id)
+                    : p.values[0].name;
                 return;
             }
           });
@@ -152,19 +152,19 @@ const listToJSON = () => {
                       updatedProduct[updatedName] =
                         p.values.length > 1
                           ? p.values.map(value => value.large_url)
-                          : values[0].large_url;
+                          : p.values[0].large_url;
                       return;
                     case 'string':
                       updatedProduct[updatedname] =
                         p.values.length > 1
-                          ? values.map(value => value.name || value.id)
-                          : values[0].name;
+                          ? p.values.map(value => value.name || value.id)
+                          : p.values[0].name;
                       return;
                     default:
                       updatedProduct[updatedname] =
                         p.values.length > 1
-                          ? values.map(value => value.name || value.id)
-                          : values[0].name;
+                          ? p.values.map(value => value.name || value.id)
+                          : p.values[0].name;
                       return;
                   }
                 });
