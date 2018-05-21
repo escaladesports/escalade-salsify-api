@@ -102,7 +102,7 @@ const listToJSON = () => {
                 return;
               default:
                 p.values.length > 1
-                  ? (updatedProduct[updatedName] = p.values.map(
+                  ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
                       value => value.name || value.id
                     ))
                   : (updatedProduct[updatedName] = p.values[0].name);
@@ -149,7 +149,7 @@ const listToJSON = () => {
                       return;
                     default:
                       p.values.length > 1
-                        ? (updatedProduct[updatedName] = p.values.map(
+                        ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
                             value => value.name || value.id
                           ))
                         : (updatedProduct[updatedName] = p.values[0].name);
