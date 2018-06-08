@@ -54,6 +54,7 @@ const listToJSON = () => {
       }
     }
     let productList = [];
+    // grab list that we want from list.json
     if (updatedList.length > 0) {
       const selectedList = updatedList.filter(l => {
         const name = l.name
@@ -63,6 +64,7 @@ const listToJSON = () => {
         return brandList.includes(name);
       });
 
+      // Loop through the list and populate products
       selectedList.forEach(async (list, index) => {
         let updatedProducts = [];
         const name = list.name
@@ -165,8 +167,7 @@ const listToJSON = () => {
         if (updatedProducts.length === products.meta.total_entries) {
           productList.push(updatedProducts);
           const progress = (
-            productList.length /
-            brandList.length *
+            (productList.length / brandList.length) *
             100
           ).toFixed(2);
           const string = `${progress} %  -  lists completed`;

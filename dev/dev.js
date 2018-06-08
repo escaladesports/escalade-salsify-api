@@ -54,6 +54,7 @@ const listToJSON = () => {
       }
     }
     let productList = [];
+    // grab list that we want from list.json
     if (updatedList.length > 0) {
       const selectedList = updatedList.filter(l => {
         const name = l.name
@@ -63,6 +64,8 @@ const listToJSON = () => {
         return brandList.includes(name);
       });
 
+      console.log('SELECTED LIST -->', selectedList);
+      // Loop through the list and populate products
       selectedList.forEach(async (list, index) => {
         let updatedProducts = [];
         const name = list.name
@@ -100,15 +103,12 @@ const listToJSON = () => {
                   value => value.large_url
                 );
                 return;
-              case 'string':
+              default:
                 p.values.length > 1
                   ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
                       value => value.name || value.id
                     ))
-                  : (updatedName[updatedname] = p.values[0].name);
-                return;
-              default:
-                updatedName[updatedname] = p;
+                  : (updatedProduct[updatedName] = p.values[0].name);
                 return;
             }
           });
@@ -150,15 +150,12 @@ const listToJSON = () => {
                         value => value.large_url
                       );
                       return;
-                    case 'string':
+                    default:
                       p.values.length > 1
                         ? (updatedProduct[`${updatedName}Arr`] = p.values.map(
                             value => value.name || value.id
                           ))
-                        : (updatedName[updatedname] = p.values[0].name);
-                      return;
-                    default:
-                      updatedName[updatedname] = p;
+                        : (updatedProduct[updatedName] = p.values[0].name);
                       return;
                   }
                 });
@@ -171,8 +168,7 @@ const listToJSON = () => {
         if (updatedProducts.length === products.meta.total_entries) {
           productList.push(updatedProducts);
           const progress = (
-            productList.length /
-            brandList.length *
+            (productList.length / brandList.length) *
             100
           ).toFixed(2);
           const string = `${progress} %  -  lists completed`;
@@ -205,3 +201,69 @@ const runApi = async () => {
 };
 
 runApi();
+
+// const fetchSheet = () => {
+//   return new Promise(async (resolve, reject) => {
+//     await connectToDatabase();
+//     const storedData = await Sheet.find({});
+//     if (storedData.length > 0) {
+//       const storedSheet = storedData[0];
+//       if (storedSheet.status === 'completed' && storedSheet.url !== null) {
+//         const res = await fetch(storedSheet.url).then(res => res);
+//         if (res.status === 403) {
+//           await Sheet.findByIdAndRemove(storedSheet._id);
+//           resolve('FILE HAS EXPIRED, REMOVING AND CREATING A NEW ONE');
+//           return;
+//         }
+//         const xlsxFile = await fetch(storedSheet.url).then(res => res.buffer());
+//         let workbook;
+//         try {
+//           workbook = XLSX.read(xlsxFile, { type: 'buffer' });
+//         } catch (e) {
+//           reject(e);
+//         }
+//         const sheet_name_list = workbook.SheetNames;
+//         sheet_name_list.forEach(y => {
+//           const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+//           let itemList = [];
+//           sheet.forEach(async (item, i) => {
+//             try {
+//               await fs.outputJson(
+//                 path.resolve(
+//                   __dirname,
+//                   `../dist/JSON/${item['Item Number']}.json`
+//                 ),
+//                 item
+//               );
+//               const data = await fs.readJson(
+//                 path.resolve(
+//                   __dirname,
+//                   `../dist/JSON/${item['Item Number']}.json`
+//                 )
+//               );
+//               itemList.push(data);
+//             } catch (e) {
+//               reject(e);
+//             }
+//             const progress = (itemList.length / sheet.length * 100).toFixed(2);
+//             for (let i = 0; i <= 100; i += 25) {
+//               if (i === Math.round(progress)) {
+//                 const string = `${progress} %  -  sheet completed`;
+//                 console.log(`${string}`);
+//               }
+//             }
+
+//             if (sheet.length === itemList.length) {
+//               await Sheet.findByIdAndRemove(storedSheet._id);
+//               resolve(sheet);
+//             }
+//           });
+//         });
+//       } else {
+//         resolve('SHEET CURRENTLY BUILDING');
+//       }
+//     } else if (storedData.length === 0) {
+//       resolve('NO SHEETS IN DB');
+//     }
+//   });
+// };
