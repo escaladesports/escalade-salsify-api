@@ -89,7 +89,6 @@ const listToJSON = () => {
           .catch(err => reject(err))
         products.products.map(product => {
           let updatedProduct = { ...product }
-          console.log(product.properties)
           product.properties.forEach(p => {
             if (p.values.length === 0) {
               return
@@ -172,6 +171,7 @@ const listToJSON = () => {
           const string = `${progress} %  -  lists completed`
           console.log(`${string}`)
         }
+        console.log(updatedProducts)
         await fs.outputJson(
           path.resolve(__dirname, `../dist/lists/${name}.json`),
           updatedProducts
