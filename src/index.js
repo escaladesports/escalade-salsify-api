@@ -87,9 +87,9 @@ const listToJSON = () => {
             }
           })
           .catch(err => reject(err))
-        console.log(products)
         products.products.map(product => {
           let updatedProduct = { ...product }
+          console.log(product.properties)
           product.properties.forEach(p => {
             if (p.values.length === 0) {
               return
