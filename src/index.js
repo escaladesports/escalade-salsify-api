@@ -171,7 +171,6 @@ const listToJSON = () => {
           const string = `${progress} %  -  lists completed`
           console.log(`${string}`)
         }
-        console.log(updatedProducts)
         await fs.outputJson(
           path.resolve(__dirname, `../dist/lists/${name}.json`),
           updatedProducts
