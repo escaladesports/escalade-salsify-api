@@ -57,14 +57,13 @@ const listToJSON = () => {
     // grab list that we want from list.json
     if (updatedList.length > 0) {
       const selectedList = updatedList.filter(l => {
+        // replace all spaces/special chars with '-'
         const name = l.name
           .replace(/^\s+|[^\s\w]+|\s+$/g, '')
           .replace(/\s+/g, '-')
           .toLowerCase()
-        console.log(name)
         return brandList.includes(name)
       })
-      console.log(selectedList)
       // Loop through the list and populate products
       selectedList.forEach(async (list, index) => {
         let updatedProducts = []
