@@ -64,7 +64,6 @@ const listToJSON = () => {
           .toLowerCase()
         return brandList.includes(name)
       })
-      console.log('LISTS', selectedList)
       // Loop through the list and populate products
       selectedList.forEach(async (list, index) => {
         let updatedProducts = []
@@ -72,6 +71,7 @@ const listToJSON = () => {
           .replace(/^\s+|[^\s\w]+|\s+$/g, '')
           .replace(/\s+/g, '-')
           .toLowerCase()
+        console.log(name)
         const products = await fetch(
           `${options.baseUrl}/products?filter==list:${
             list.id
