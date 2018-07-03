@@ -64,6 +64,7 @@ const listToJSON = () => {
           .toLowerCase()
         return brandList.includes(name)
       })
+      console.log('LISTS', selectedList)
       // Loop through the list and populate products
       selectedList.forEach(async (list, index) => {
         let updatedProducts = []
