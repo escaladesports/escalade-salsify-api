@@ -1,12 +1,12 @@
 require('envdotjs').load()
-import config from '../config.json'
+// import config from '../config.json'
 import path from 'path'
-import XLSX from 'xlsx'
+// import XLSX from 'xlsx'
 import fs from 'fs-extra'
 import fetch from 'isomorphic-fetch'
-import axios from 'axios'
-import { connectToDatabase } from '../utils/db'
-import Sheet from '../models/Sheet'
+// import axios from 'axios'
+// import { connectToDatabase } from '../utils/db'
+// import Sheet from '../models/Sheet'
 import camelCase from 'camelcase'
 import brandList from '../list.json'
 
@@ -96,6 +96,7 @@ const listToJSON = () => {
             let updatedName = camelCase(p.id.replace(/^\s+|[^\s\w]+|\s+$/g, ''))
             switch (p.data_type) {
               case 'digital_asset':
+                console.log(p)
                 updatedProduct[updatedName] = p.values.map(
                   value => value.large_url
                 )
@@ -143,6 +144,8 @@ const listToJSON = () => {
 
                   switch (p.data_type) {
                     case 'digital_asset':
+                      console.log(p)
+
                       updatedProduct[updatedName] = p.values.map(
                         value => value.large_url
                       )
