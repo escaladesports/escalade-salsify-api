@@ -95,9 +95,18 @@ const listToJSON = () => {
             let updatedName = camelCase(p.id.replace(/^\s+|[^\s\w]+|\s+$/g, ''))
             switch (p.data_type) {
               case 'digital_asset':
-                updatedProduct[updatedName] = p.values.map(
-                  value => value.large_url
-                )
+                updatedProduct[updatedName] = p.values.map(value => {
+                  const splitArr = value.large_url.split('/')
+                  const firstHalf = splitArr.slice(0, splitArr.length - 2)
+                  const secondHalf = splitArr.slice(
+                    splitArr.length - 1,
+                    splitArr.length
+                  )
+                  console.log(splitArr.length)
+
+                  console.log(firstHalf.length, secondHalf.length)
+                  return value.large_url
+                })
                 return
               default:
                 p.values.length > 1
