@@ -95,7 +95,6 @@ const listToJSON = () => {
             let updatedName = camelCase(p.id.replace(/^\s+|[^\s\w]+|\s+$/g, ''))
             switch (p.data_type) {
               case 'digital_asset':
-                console.log(p)
                 updatedProduct[updatedName] = p.values.map(
                   value => value.large_url
                 )
@@ -143,8 +142,6 @@ const listToJSON = () => {
 
                   switch (p.data_type) {
                     case 'digital_asset':
-                      console.log(p)
-
                       updatedProduct[updatedName] = p.values.map(value => {
                         const splitArr = value.large_url.split('/')
                         const firstHalf = splitArr.slice(0, splitArr.length - 2)
