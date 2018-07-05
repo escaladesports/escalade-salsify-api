@@ -152,8 +152,9 @@ const listToJSON = () => {
                           splitArr.length - 1,
                           splitArr.length
                         )
+                        console.log(splitArr.length)
 
-                        console.log(firstHalf, secondHalf)
+                        console.log(firstHalf.length, secondHalf.length)
                         return value.large_url
                       })
                       return
