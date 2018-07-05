@@ -103,8 +103,7 @@ const listToJSON = () => {
                     splitArr.length
                   )
                   const updatedValue = firstHalf.concat(secondHalf).join('/')
-                  console.log(updatedValue)
-                  return value.large_url
+                  return updatedValue
                 })
                 return
               default:
@@ -157,10 +156,10 @@ const listToJSON = () => {
                           splitArr.length - 1,
                           splitArr.length
                         )
-                        console.log(splitArr.length)
-
-                        console.log(firstHalf.length, secondHalf.length)
-                        return value.large_url
+                        const updatedValue = firstHalf
+                          .concat(secondHalf)
+                          .join('/')
+                        return updatedValue
                       })
                       return
                     default:
