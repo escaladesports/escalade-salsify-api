@@ -71,7 +71,6 @@ const listToJSON = () => {
           .replace(/^\s+|[^\s\w]+|\s+$/g, '')
           .replace(/\s+/g, '-')
           .toLowerCase()
-        console.log(name)
         const products = await fetch(
           `${options.baseUrl}/products?filter==list:${
             list.id
