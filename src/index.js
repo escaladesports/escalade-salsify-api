@@ -146,9 +146,17 @@ const listToJSON = () => {
                     case 'digital_asset':
                       console.log(p)
 
-                      updatedProduct[updatedName] = p.values.map(
-                        value => value.large_url
-                      )
+                      updatedProduct[updatedName] = p.values.map(value => {
+                        const splitArr = value.large_url.split('/')
+                        const firstHalf = splitArr.slice(0, splitArr.length - 2)
+                        const secondHalf = splitArr.slice(
+                          splitArr.length - 1,
+                          splitArr.length
+                        )
+
+                        console.log(firstHalf, secondHalf)
+                        return value.large_url
+                      })
                       return
                     default:
                       p.values.length > 1
