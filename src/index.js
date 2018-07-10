@@ -92,6 +92,7 @@ const listToJSON = () => {
             if (p.values.length === 0) {
               return
             }
+
             let updatedName = camelCase(p.id.replace(/^\s+|[^\s\w]+|\s+$/g, ''))
             switch (p.data_type) {
               case 'digital_asset':
