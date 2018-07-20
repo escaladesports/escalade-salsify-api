@@ -87,13 +87,13 @@ const listToJSON = () => {
           })
           .catch(err => reject(err))
         products.products.map(product => {
+          if (product.id === 'VS5000') {
+            console.log(product)
+          }
           let updatedProduct = { ...product }
           product.properties.forEach(p => {
             if (p.values.length === 0) {
               return
-            }
-            if ((p.id = '12-0028-2') && listName === 'escaladesportscom-new') {
-              console.log(p)
             }
             let updatedName = camelCase(p.id.replace(/^\s+|[^\s\w]+|\s+$/g, ''))
             switch (p.data_type) {
@@ -149,12 +149,6 @@ const listToJSON = () => {
                   let updatedName = camelCase(
                     p.id.replace(/^\s+|[^\s\w]+|\s+$/g, '')
                   )
-                  if (
-                    (p.id = '12-0028-2') &&
-                    listName === 'escaladesportscom-new'
-                  ) {
-                    console.log(p)
-                  }
                   switch (p.data_type) {
                     case 'digital_asset':
                       updatedProduct[updatedName] = p.values.map(value => {
